@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ConsoleApp28
 {
-    public static class Compodents //Covers All Basic Compodents those that not connected directly to something
+    public static class Compodents //Covers All Basic Compodents that not connected directly to something
     {
         public static List<string> explaination_to_component = new List<string>()
         {
