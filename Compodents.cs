@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ConsoleApp28
 {
@@ -19,7 +20,8 @@ namespace ConsoleApp28
                 "close the cmd",
                 "make dir -- mkdir \"directory name\"",
                 "remove file -- del \"file name\"",
-                "remove directory -- rmdir \"directory name\""
+                "remove directory -- rmdir \"directory name\"",
+                "Return the text of the file"
         };
         public static List<string> components = new List<string>()
             {
@@ -68,7 +70,6 @@ namespace ConsoleApp28
                 }
             }
         }
-
         public static void Help()
         {
             int counter = 0;

@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace ConsoleApp28
 {
@@ -18,6 +19,10 @@ namespace ConsoleApp28
             Console.WriteLine("Sample cmd Program");
             Console.WriteLine("Note: Not all cmd components included");
             Console.WriteLine("To Get All Components Please Write \\help");
+
+
+            var regax = new Regex(@"\w:");
+            var save_drivers_path = new Dictionary<string, string>();
             var components = Compodents.components;
             var explaination_to_component = Compodents.explaination_to_component;
             DirectoryInfo directory = new DirectoryInfo("C:\\"); // Cover dir change;
@@ -26,8 +31,49 @@ namespace ConsoleApp28
             {
                 Console.Write(directory.FullName+">"); // Get Directory Place
                 string Component = Console.ReadLine(); // Get Component
+                #region Change Driver
+                var match = regax.IsMatch(Component);               
+                if (match == true)
+                {
+                    Component = Component.Trim();
+                    try
+                    {
+                        var driver_match = regax.Match(directory.FullName); //Get Current Driver
+                        if (save_drivers_path.ContainsKey(driver_match.ToString().ToUpper()) == false)
+                        {
+                            save_drivers_path.Add(driver_match.ToString().ToUpper(), directory.FullName);
+                        }
+                        else
+                        {
+                            save_drivers_path[driver_match.ToString().ToUpper()] = directory.FullName; //Set in the dictonary the current path on it
+                        }
+                        try
+                        {
+                            var dir = new DirectoryInfo(@Component + "\\");
+                            dir.GetFiles(); //raise an error if driver not found.
+                        }
+                        catch
+                        {
+                            Console.WriteLine("No Driver Found");
+                            continue;
+                        }
+                        if(save_drivers_path.ContainsKey(Component.ToUpper()) == false)
+                        {
+                            save_drivers_path.Add(Component.ToUpper(), Component.ToUpper());
+                        }
+                        directory = new DirectoryInfo(@save_drivers_path[Component.ToUpper()] +"\\");
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine("Access Denied" + " "+e.Message);
+                        continue;
+                    }
+                    cd_changes = new Stack<object>();
+                    continue;
+                }
+                #endregion
                 #region TypeCompodent
-                if(Component.ToLower().StartsWith("type "))
+                if (Component.ToLower().StartsWith("type "))
                 {
                     string file_name = Component.Split(' ')[1];
                     DirectorysAndFiles.TypeCompodent(file_name, directory.FullName);
@@ -58,7 +104,21 @@ namespace ConsoleApp28
                 #region CreateFile-ECHO
                 if (Component.ToLower().StartsWith("echo")) //ex: ECHO file>>file.txt
                 {
-                    string[] component_spliter = Component.Split(">>");//seperated to ECHO, file>>file.txt
+                    string[] component_spliter;               
+                    component_spliter = Component.Split(">>");//seperated to ECHO, file>>file.txt
+                    if(component_spliter.Length == 1)
+                    {
+                        component_spliter = Component.Split(' ');
+                        for (int i = 0; i < component_spliter.Length; i++)
+                        {
+                            if(i!=0)
+                            {
+                                Console.Write(component_spliter[i]+" ");
+                            }
+                        }
+                        Console.WriteLine();
+                        continue;
+                    }
                     string[] seperate_echo_before_two_arrows = component_spliter[0].Split(' ');
                     string InputText = ""; //text
                     foreach(var nonspace in seperate_echo_before_two_arrows)
@@ -138,7 +198,7 @@ namespace ConsoleApp28
                     string DirectoryMoveTo = "";
                     try
                     {
-                        DirectoryMoveTo = Component.TrimStart().ToLower().Split(' ')[1];
+                        DirectoryMoveTo = Component.TrimStart().Split(' ')[1];
                     }
                     catch
                     {
