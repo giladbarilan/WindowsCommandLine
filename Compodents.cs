@@ -16,11 +16,13 @@ namespace ConsoleApp28
                 "Get All Components",
                 "Create File -- echo \"text input\" >> \"filename.txt\"",
                 "Change Directory -- cd \"directory name\"",
+                "Change Directory -- chdir \"directory name\"",
                 "Return To Last Directory",
                 "close the cmd",
                 "make dir -- mkdir \"directory name\"",
                 "remove file -- del \"file name\"",
                 "remove directory -- rmdir \"directory name\"",
+                "remove directory -- rd \"directory name\"",
                 "Return the text of the file"
         };
         public static List<string> components = new List<string>()
@@ -28,14 +30,16 @@ namespace ConsoleApp28
                 "dir",//See All files& directories on the current working directory
                 "color",//Change Color
                 "cls",//Clean Screen
-                "\\help", //Get All Components
+                "help", //Get All Components
                 "echo", //Create File
                 "cd",//Change Directory
+                "chdir",//Change Directory
                 "cd..",//Return To Last Directory
                 "exit",//close the cmd
                 "mkdir",//make dir
                 "del",//remove file
                 "rmdir",//remove directory
+                "rd",//remove directory
                 "type",//Return All Bytes
             };
         public static void DirPrinterFunction<T>(T[] array)
@@ -43,23 +47,17 @@ namespace ConsoleApp28
             if (typeof(T) == typeof(FileInfo))
             {
                 FileInfo[] file_array = array as FileInfo[];
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Files = ");
-                Console.ForegroundColor = ConsoleColor.White;
                 foreach (var file in file_array)
                 {
-                    Console.WriteLine(file.Name);
+                    Console.WriteLine(file.LastAccessTime.ToString("dd/MM/yy") + " "+file.Name);
                 }
             }
             else if (typeof(T) == typeof(DirectoryInfo))
             {
                 DirectoryInfo[] dir_array = array as DirectoryInfo[];
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Directory = ");
-                Console.ForegroundColor = ConsoleColor.White;
                 foreach (var dir in dir_array)
                 {
-                    Console.WriteLine(dir.Name + "\\");
+                    Console.WriteLine(dir.LastAccessTime.ToString("dd/MM/yy") + " <DIR> " + dir.Name + "\\");
                 }
             }
             else

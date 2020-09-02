@@ -1,18 +1,11 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
-using ConsoleApp28;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace ConsoleApp28
 {
@@ -24,6 +17,7 @@ namespace ConsoleApp28
             Console.WriteLine("Sample cmd Program");
             Console.WriteLine("Note: Not all cmd components included");
             Console.WriteLine("To Get All Components Please Write \\help");
+            Console.Title = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
             var regax = new Regex(@"\w:"); //Search for driver change
             var regax_open_file = new Regex(@"\w+\.\w+"); //open file stream
@@ -174,7 +168,7 @@ namespace ConsoleApp28
                 }
                 #endregion
                 #region Help
-                if (Component.ToLower() == "\\help")
+                if (Component.ToLower() == "help")
                 {
                     Compodents.Help();
                 }
@@ -223,7 +217,7 @@ namespace ConsoleApp28
                 }
                 #endregion
                 #region MoveDirectory
-                if(Component.TrimStart().ToLower().Split(' ')[0] == "cd")
+                if(Component.TrimStart().ToLower().Split(' ')[0] == "cd" || Component.TrimStart().ToLower().Split(' ')[0] == "chdir")
                 {
                     string DirectoryMoveTo = "";
                     try
