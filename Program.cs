@@ -3,11 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using ConsoleApp28;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace ConsoleApp28
 {
@@ -20,8 +25,8 @@ namespace ConsoleApp28
             Console.WriteLine("Note: Not all cmd components included");
             Console.WriteLine("To Get All Components Please Write \\help");
 
-
-            var regax = new Regex(@"\w:");
+            var regax = new Regex(@"\w:"); //Search for driver change
+            var regax_open_file = new Regex(@"\w+\.\w+"); //open file stream
             var save_drivers_path = new Dictionary<string, string>();
             var components = Compodents.components;
             var explaination_to_component = Compodents.explaination_to_component;
@@ -30,7 +35,32 @@ namespace ConsoleApp28
             while(true)
             {
                 Console.Write(directory.FullName+">"); // Get Directory Place
-                string Component = Console.ReadLine(); // Get Component
+                string Component = Console.ReadLine();
+                #region OpenFile
+                /*
+                var ismatch = regax_open_file.IsMatch(Component);
+                if(ismatch)
+                {
+                    var match_open_file = regax_open_file.Match(Component);
+                    if(Component.Trim() == match_open_file.Value) //want to open file
+                    {
+                        var open_info = new Process();
+                        open_info.StartInfo.FileName = directory.FullName;
+                        bool? boolean = null;
+                        try
+                        {
+                            boolean = open_info.Start();
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Access Denied");
+                        }
+                        Console.WriteLine(boolean+" Boolean");
+                        continue;
+                    }
+                }
+                */
+                #endregion
                 #region Change Driver
                 var match = regax.IsMatch(Component);               
                 if (match == true)
@@ -209,7 +239,7 @@ namespace ConsoleApp28
                         if (Directory.Exists(directory.FullName + "\\" + DirectoryMoveTo))
                         {
                             cd_changes.Push(directory.FullName);
-                            directory = new DirectoryInfo(directory.FullName + "\\" + DirectoryMoveTo);
+                            directory = new DirectoryInfo(NoGetNeededFunctions.FixDirectorySizes(DirectoryMoveTo,directory));
                         }
                         else
                         {
