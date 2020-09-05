@@ -11,25 +11,34 @@ namespace ConsoleApp28
 {
     class Program
     {
+        public static DirectoryInfo directory;
+        public static Regex regax = new Regex(@"\w:");
         public static void Main(string[] args)
         {
+            #region SetUpEnviroment
             Console.Clear();
             Console.WriteLine("Sample cmd Program");
             Console.WriteLine("Note: Not all cmd components included");
-            Console.WriteLine("To Get All Components Please Write \\help");
+            Console.WriteLine("To Get All Components Please Write help");
             Console.Title = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-            var regax = new Regex(@"\w:"); //Search for driver change
+            #endregion
+            regax = new Regex(@"\w:"); //Search for driver change
             var regax_open_file = new Regex(@"\w+\.\w+"); //open file stream
             var save_drivers_path = new Dictionary<string, string>();
             var components = Compodents.components;
             var explaination_to_component = Compodents.explaination_to_component;
-            DirectoryInfo directory = new DirectoryInfo("C:\\"); // Cover dir change;
-            var cd_changes = new Stack<object>();
+            directory = new DirectoryInfo("C:\\"); // Cover dir change;
+            Dictionary<string,Stack<string>> multidriver_cd = new Dictionary<string,Stack<string>>();
+
+
             while(true)
             {
                 Console.Write(directory.FullName+">"); // Get Directory Place
-                string Component = Console.ReadLine();
+                string Component = @Console.ReadLine();
+                if(Component == "")
+                {
+                    continue; //Print The path again
+                }
                 #region OpenFile
                 /*
                 var ismatch = regax_open_file.IsMatch(Component);
@@ -56,13 +65,16 @@ namespace ConsoleApp28
                 */
                 #endregion
                 #region Change Driver
-                var match = regax.IsMatch(Component);               
-                if (match == true)
+                var match = regax.IsMatch(Component);
+                var syntax_match = regax.Match(Component);
+                if (match == true && syntax_match.ToString() == Component.Trim())
                 {
+                    string matching;
                     Component = Component.Trim();
                     try
                     {
                         var driver_match = regax.Match(directory.FullName); //Get Current Driver
+                        matching = driver_match.ToString();
                         if (save_drivers_path.ContainsKey(driver_match.ToString().ToUpper()) == false)
                         {
                             save_drivers_path.Add(driver_match.ToString().ToUpper(), directory.FullName);
@@ -86,14 +98,25 @@ namespace ConsoleApp28
                             save_drivers_path.Add(Component.ToUpper(), Component.ToUpper());
                         }
                         directory = new DirectoryInfo(@save_drivers_path[Component.ToUpper()] +"\\");
+                        if(multidriver_cd.ContainsKey(matching) == false)
+                        {
+                            multidriver_cd.Add(matching, new Stack<string>());
+                        }
                     }
                     catch(Exception e)
                     {
                         Console.WriteLine("Access Denied" + " "+e.Message);
                         continue;
-                    }
-                    cd_changes = new Stack<object>();
+                    }                   
                     continue;
+                }
+                #endregion              
+                #region Check Weather Component Exsist
+                if (components.Any(x=>x.Split(' ')[0] == Component.ToLower().Split(' ')[0]) == false) // Managing if the component exsist
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(new SyntaxErrorException().Message);
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
                 #endregion
                 #region TypeCompodent
@@ -101,14 +124,6 @@ namespace ConsoleApp28
                 {
                     string file_name = Component.Split(' ')[1];
                     DirectorysAndFiles.TypeCompodent(file_name, directory.FullName);
-                }
-                #endregion
-                #region Check Weather Component Exsist
-                if (components.Any(x=>x.Split(' ')[0] == Component.ToLower().Split(' ')[0]) == false) // Managing if the component exsist
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine(new SyntaxErrorException().Message);
-                    Console.ForegroundColor = ConsoleColor.White;
                 }
                 #endregion
                 #region Dir Component
@@ -232,7 +247,11 @@ namespace ConsoleApp28
                     {
                         if (Directory.Exists(directory.FullName + "\\" + DirectoryMoveTo))
                         {
-                            cd_changes.Push(directory.FullName);
+                            if(multidriver_cd.ContainsKey(regax.Match(directory.FullName).ToString()) == false)
+                            {
+                                multidriver_cd.Add(regax.Match(directory.FullName).ToString(), new Stack<string>());
+                            }
+                            multidriver_cd[regax.Match(directory.FullName).ToString()].Push(directory.FullName);
                             directory = new DirectoryInfo(NoGetNeededFunctions.FixDirectorySizes(DirectoryMoveTo,directory));
                         }
                         else
@@ -249,9 +268,16 @@ namespace ConsoleApp28
                 #region MoveDirectoryBack
                 if (Component.Trim().ToLower() == "cd..")
                 {
-                    if (cd_changes.Count() > 0)
+                    if (multidriver_cd[regax.Match(directory.FullName).ToString()].Count() > 0)
                     {
-                        directory = new DirectoryInfo(cd_changes.Pop().ToString());
+                        try
+                        {
+                            directory = new DirectoryInfo(multidriver_cd[regax.Match(directory.FullName).ToString()].Pop());
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
                 #endregion
@@ -295,12 +321,26 @@ namespace ConsoleApp28
                     string dir_to_remove = Component.ToLower().Split(' ')[1];
                     if(Directory.Exists(directory.FullName +"\\"+dir_to_remove))
                     {
-                        Directory.Delete(directory.FullName + "\\" + dir_to_remove);
+                        Directory.Delete(directory.FullName + "\\" + dir_to_remove,true);
                     }
                     else
                     {
                         Console.WriteLine("Directory Not Found");
                     }
+                }
+                #endregion
+                #region Copy
+                if(Component.Split(' ')[0].ToLower() == "copy")
+                {
+                    try
+                    {
+                        NoGetNeededFunctions.CopyFile(@directory.FullName + @"\" + @Component.Split(' ')[1], @Component.Split(' ')[2]);
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                    continue;
                 }
                 #endregion
 

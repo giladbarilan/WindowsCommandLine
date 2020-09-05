@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ConsoleApp28
@@ -17,50 +18,66 @@ namespace ConsoleApp28
         public static string Input(DirectoryInfo directory, int len)
         {
             string Sentence = "";
-            string add_in = "";
-            while(true)
+            string plugin = "";
+            bool FirstBool = false;
+            int save_cursor_left = 0;
+            while (true)
             {
                 ConsoleKey CharInput = Console.ReadKey().Key;
                 if (CharInput == ConsoleKey.Enter)
                 {
-                    Console.SetCursorPosition(0, Console.CursorTop+1);
                     break;
                 }
-                else if (CharInput == ConsoleKey.Tab) //Show Optional Files
+                else if (CharInput == ConsoleKey.Backspace || CharInput == ConsoleKey.Delete)
                 {
-                    Length[1] = add_in.Length;
-                    add_in = GetFilesAndDirectories(directory);
-                }
-                else if (CharInput == ConsoleKey.Backspace)
-                {
-                    string new_str = "";
                     try
                     {
-                        for (int i = 0; i < Sentence.Length - 1; i++)
+                        if(Sentence.Length>0)
+                            Sentence = Sentence.Substring(0, Sentence.Length - 1);
+                        if (Sentence.Length > 0)
                         {
-                            new_str += Sentence[i];
+                            if (save_cursor_left==Console.CursorLeft)
+                            {
+                                Console.SetCursorPosition(Console.CursorLeft, Console.CursorTop);
+                                Console.Write(" ");
+                                FirstBool = true;
+                            }
+                            else
+                            {
+                                Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                                Console.Write(" ");
+                            }
                         }
+                        else
+                        {
+                            Console.SetCursorPosition(len-1, Console.CursorTop);
+                            Console.Write(" ");
+                            Console.SetCursorPosition(len-1, Console.CursorTop);
+                        }                       
                     }
                     catch
                     {
 
                     }
-                    Length[0] = Sentence.Length;
-                    Sentence = new_str;
+                }
+                else if(CharInput == ConsoleKey.Tab)
+                {
+                    Console.SetCursorPosition(len+Sentence.Length, Console.CursorTop);
+                    plugin = GetFilesAndDirectories(directory);
+                    Console.Write(" " + plugin);
                 }
                 else
                 {
-                    if(char.Parse(((char)CharInput).ToString().ToLower())>='a' && char.Parse(((char)CharInput).ToString().ToLower())<='z')
-                         Sentence += ((char)CharInput).ToString().ToLower();
-                    else
+                    if (Console.CapsLock)
                     {
                         Sentence += (char)CharInput;
                     }
+                    else
+                    {
+                        Sentence += ((char)CharInput).ToString().ToLower();
+                    }
+                    save_cursor_left = Console.CursorLeft;
                 }
-                Console.SetCursorPosition(len, Console.CursorTop);
-                ClearLine(len,len+Length[0]+Length[1]);
-                Console.SetCursorPosition(len, Console.CursorTop);
-                Console.Write(Sentence+add_in);
             }
             return Sentence;
         }
@@ -91,7 +108,7 @@ namespace ConsoleApp28
 
         private static void ClearLine(int length, int max_length)
         {
-            for (int i = length; i < max_length; i++)
+            for (int i = length; i <= max_length; i++)
             {
                 Console.Write(' ');
             }
@@ -126,6 +143,41 @@ namespace ConsoleApp28
                 }
             }
             return FullName;
+        }
+
+        /// <summary>
+        /// Copy and paste files.
+        /// </summary>
+        /// <param name="copy"> The file to copy.</param>
+        /// <param name="paste_path">The path to paste.</param>
+        public static void CopyFile(string copy, string paste_path)
+        {
+            FileInfo file = null;
+            if(Program.regax.IsMatch(copy) == false)
+            {
+                @copy = Program.directory + "\\" + copy;
+            }
+            if(Program.regax.IsMatch(paste_path) == false)
+            {
+                @paste_path = Program.directory + "\\" + paste_path;
+            }
+            try
+            {
+                file = new FileInfo(copy);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return;
+            }
+            try
+            {
+                file.CopyTo(paste_path);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

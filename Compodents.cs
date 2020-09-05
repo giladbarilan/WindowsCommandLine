@@ -23,6 +23,7 @@ namespace ConsoleApp28
                 "remove file -- del \"file name\"",
                 "remove directory -- rmdir \"directory name\"",
                 "remove directory -- rd \"directory name\"",
+                "copy file -- copy \"file name\" \"location\"",
                 "Return the text of the file"
         };
         public static List<string> components = new List<string>()
@@ -40,6 +41,7 @@ namespace ConsoleApp28
                 "del",//remove file
                 "rmdir",//remove directory
                 "rd",//remove directory
+                "copy",//remove directory
                 "type",//Return All Bytes
             };
         public static void DirPrinterFunction<T>(T[] array)
