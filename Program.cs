@@ -343,6 +343,29 @@ namespace ConsoleApp28
                     continue;
                 }
                 #endregion
+                #region XCopy
+                if (Component.Split(' ')[0].ToLower() == "xcopy")
+                {
+                    try
+                    {
+                        NoGetNeededFunctions.CopyFile(@directory.FullName + @"\" + @Component.Split(' ')[1], @Component.Split(' ')[2]);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                    try
+                    {
+                        File.Delete(@directory.FullName + @"\" + @Component.Split(' ')[1]);
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                    continue;
+                }
+
+                #endregion
 
             }
 
