@@ -40,29 +40,23 @@ namespace ConsoleApp28
                     continue; //Print The path again
                 }
                 #region OpenFile
-                /*
                 var ismatch = regax_open_file.IsMatch(Component);
                 if(ismatch)
                 {
                     var match_open_file = regax_open_file.Match(Component);
-                    if(Component.Trim() == match_open_file.Value) //want to open file
+                    if(Component.Trim() == match_open_file.ToString()) //want to open file
                     {
-                        var open_info = new Process();
-                        open_info.StartInfo.FileName = directory.FullName;
-                        bool? boolean = null;
                         try
                         {
-                            boolean = open_info.Start();
+                            Process.Start(@"cmd.exe", @"/"+@directory.FullName[0]+" "+@directory.FullName+@"\"+@Component);
                         }
-                        catch
+                        catch(Exception e)
                         {
-                            Console.WriteLine("Access Denied");
+                            Console.WriteLine(e.Message);
                         }
-                        Console.WriteLine(boolean+" Boolean");
-                        continue;
                     }
+                    continue;
                 }
-                */
                 #endregion
                 #region Change Driver
                 var match = regax.IsMatch(Component);
