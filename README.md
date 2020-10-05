@@ -1,6 +1,6 @@
-##Windows Command Line
+# Windows Command Line  
 
-##Explain
+## Explain  
 This program is the windows cmd clone.  
 This program includes over 15 windows cmd commands.  
 Among the commands you can also find other cmd features like opening files.
